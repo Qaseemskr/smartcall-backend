@@ -1,10 +1,17 @@
 {
   "name": "smartcall-backend",
   "version": "1.0.0",
+  "description": "Backend server for SmartCall using Africa's Talking API",
   "main": "index.js",
-  "scripts": { "start": "node index.js" },
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
-    "africastalking": "^1.0.0",
-    "express": "^4.19.0"
-  }
+    "express": "^4.19.0",
+    "africastalking": "^0.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
 }
