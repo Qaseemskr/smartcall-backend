@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "express": "^4.19.0",
+    "cors": "^2.8.5",
     "africastalking": "^0.7.0"
   },
   "engines": {
