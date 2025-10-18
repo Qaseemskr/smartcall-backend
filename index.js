@@ -27,16 +27,19 @@ app.post("/startCall", async (req, res) => {
 
   try {
     const response = await voice.call({
-      callFrom: "+2342017001172", // your Africa's Talking virtual number
+      callFrom: "+2342017001172", // your AT virtual number
       callTo: [to],
     });
+
+    console.log("Call success:", response);
     res.json({ success: true, response });
   } catch (error) {
     console.error("Call error:", error);
-    res.json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message || "Unknown error" });
   }
 });
 
 // --- Start server ---
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log("Server running on port", PORT));
+
