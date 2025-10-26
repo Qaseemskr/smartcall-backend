@@ -46,6 +46,22 @@ app.post("/api/call", async (req, res) => {
   }
 });
 
+/* ---------- VOICE CALLBACK ---------- */
+app.post("/voice", (req, res) => {
+  console.log("Voice callback received:", req.body);
+
+  // Respond with basic XML to keep the call alive
+  const xmlResponse = `
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Response>
+      <Say>Welcome to SmartCall. Your call is now connected.</Say>
+    </Response>
+  `;
+
+  res.set("Content-Type", "application/xml");
+  res.send(xmlResponse);
+});
+
 /* ---------- END CALL ---------- */
 app.post("/api/end", async (req, res) => {
   try {
@@ -61,3 +77,4 @@ app.post("/api/end", async (req, res) => {
 /* ---------- SERVER ---------- */
 const PORT = process.env.PORT || 10000; // Render usually assigns this automatically
 app.listen(PORT, () => console.log(`🚀 SmartCall backend running on port ${PORT}`));
+
