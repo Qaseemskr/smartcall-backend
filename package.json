@@ -2,6 +2,7 @@
   "name": "smartcall-backend",
   "version": "1.0.0",
   "description": "Backend server for SmartCall using Africa's Talking API",
+  "type": "module", 
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
