@@ -7,8 +7,10 @@ import cors from "cors";
 import africastalking from "africastalking";
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /* ---------- AFRICA'S TALKING CONFIG ---------- */
 const AT_USERNAME = "SmartCall-Live"; // your Africa's Talking username
@@ -36,6 +38,8 @@ app.post("/api/call", async (req, res) => {
     const result = await voice.call({
       callFrom: CALLER_ID,
       callTo: [to],
+      // 👇 Important: point Africa's Talking back to your /voice callback
+      url: "https://smartcall-backend-7cm9.onrender.com/voice",
     });
 
     console.log("✅ Call success:", result);
@@ -48,18 +52,26 @@ app.post("/api/call", async (req, res) => {
 
 /* ---------- VOICE CALLBACK ---------- */
 app.post("/voice", (req, res) => {
-  console.log("Voice callback received:", req.body);
+  console.log("📞 Voice callback received:", req.body);
 
-  // Respond with basic XML to keep the call alive
-  const xmlResponse = `
-    <?xml version="1.0" encoding="UTF-8"?>
-    <Response>
-      <Say>Welcome to SmartCall. Your call is now connected.</Say>
-    </Response>
-  `;
+  const isInbound = req.body.isActive === "1";
 
-  res.set("Content-Type", "application/xml");
-  res.send(xmlResponse);
+  if (isInbound) {
+    // Active call — respond with XML instructions
+    const xmlResponse = `
+      <?xml version="1.0" encoding="UTF-8"?>
+      <Response>
+        <Say voice="man">Welcome to SmartCall. Connecting your call now.</Say>
+        <Dial phoneNumbers="${req.body.callerNumber}"/>
+      </Response>
+    `;
+    res.set("Content-Type", "application/xml");
+    res.send(xmlResponse);
+  } else {
+    // Call has ended — just acknowledge
+    console.log("📴 Call summary:", req.body);
+    res.status(200).send("OK");
+  }
 });
 
 /* ---------- END CALL ---------- */
@@ -75,6 +87,5 @@ app.post("/api/end", async (req, res) => {
 });
 
 /* ---------- SERVER ---------- */
-const PORT = process.env.PORT || 10000; // Render usually assigns this automatically
+const PORT = process.env.PORT || 10000; // Render sets this automatically
 app.listen(PORT, () => console.log(`🚀 SmartCall backend running on port ${PORT}`));
-
