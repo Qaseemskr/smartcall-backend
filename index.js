@@ -32,21 +32,37 @@ app.get("/", (req, res) => {
 /* ---------- START CALL ---------- */
 app.post("/api/call", async (req, res) => {
   const { to } = req.body;
-  if (!to) return res.status(400).json({ success: false, error: "Missing 'to' number." });
+  if (!to) {
+    return res.status(400).json({ success: false, error: "Missing 'to' number." });
+  }
 
   try {
+    // Attempt to initiate the call via Africa's Talking
     const result = await voice.call({
       callFrom: CALLER_ID,
       callTo: [to],
-      // 👇 Important: point Africa's Talking back to your /voice callback
       url: "https://smartcall-backend-7cm9.onrender.com/voice",
     });
 
-    console.log("✅ Call success:", result);
+    console.log("📞 Call attempt result:", result);
+
+    // Check for insufficient wallet balance or general call failure
+    if (!result || result.errorMessage !== "None") {
+      console.log("❌ Africa's Talking call failed:", result.errorMessage);
+      return res.status(400).json({
+        success: false,
+        error: "You do not have sufficient balance to make this call. Please recharge your wallet and try again. Thank you for using SmartCall.",
+      });
+    }
+
+    // If call was queued successfully
     res.json({ success: true, result });
   } catch (error) {
     console.error("❌ Call error:", error);
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({
+      success: false,
+      error: "Server error: " + (error.message || "Unknown error occurred."),
+    });
   }
 });
 
@@ -89,3 +105,4 @@ app.post("/api/end", async (req, res) => {
 /* ---------- SERVER ---------- */
 const PORT = process.env.PORT || 10000; // Render sets this automatically
 app.listen(PORT, () => console.log(`🚀 SmartCall backend running on port ${PORT}`));
+
