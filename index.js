@@ -37,7 +37,6 @@ app.post("/api/call", async (req, res) => {
   }
 
   try {
-    // Attempt to initiate the call via Africa's Talking
     const result = await voice.call({
       callFrom: CALLER_ID,
       callTo: [to],
@@ -46,20 +45,29 @@ app.post("/api/call", async (req, res) => {
 
     console.log("📞 Call attempt result:", result);
 
-    // Check for insufficient wallet balance or general call failure
-    if (!result || result.errorMessage !== "None") {
-      console.log("❌ Africa's Talking call failed:", result.errorMessage);
+    // --- Check Africa's Talking response for failed or insufficient balance ---
+    const entry = result?.entries?.[0];
+    const callStatus = entry?.status || "Unknown";
+
+    if (
+      callStatus.toLowerCase().includes("failed") ||
+      callStatus.toLowerCase().includes("insufficientcredit") ||
+      callStatus.toLowerCase().includes("rejected") ||
+      callStatus.toLowerCase().includes("error")
+    ) {
+      console.log("❌ Call blocked due to:", callStatus);
       return res.status(400).json({
         success: false,
-        error: "You do not have sufficient balance to make this call. Please recharge your wallet and try again. Thank you for using SmartCall.",
+        error:
+          "You do not have sufficient balance to make this call. Please recharge your wallet and try again. Thank you for using SmartCall.",
       });
     }
 
-    // If call was queued successfully
+    // --- If Africa's Talking queued the call properly ---
     res.json({ success: true, result });
   } catch (error) {
     console.error("❌ Call error:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: "Server error: " + (error.message || "Unknown error occurred."),
     });
@@ -105,4 +113,5 @@ app.post("/api/end", async (req, res) => {
 /* ---------- SERVER ---------- */
 const PORT = process.env.PORT || 10000; // Render sets this automatically
 app.listen(PORT, () => console.log(`🚀 SmartCall backend running on port ${PORT}`));
+
 
