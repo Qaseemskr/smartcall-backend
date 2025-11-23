@@ -72,7 +72,8 @@ app.post("/api/call", async (req, res) => {
       return res.status(400).json({
         success: false,
         error:
-          "You do not have sufficient balance to make this call. Please recharge your wallet and try again. Thank you for using SmartCall.",
+          "We are currently upgrading our SmartCall main wallet to improve call quality and reliability. During this short maintenance period, calls may not connect.
+Ee truly apologise for any incomvinience this my cause, Thank you for your kind understanding and patience — we truly appreciate you.",
       });
     }
 
@@ -129,3 +130,4 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log(`🚀 SmartCall backend running on port ${PORT}`)
 );
+
