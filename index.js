@@ -62,20 +62,19 @@ app.post("/api/call", async (req, res) => {
     const callStatus = entry?.status || "Unknown";
 
     // Check for insufficient balance or other failures
-    if (
-      callStatus.toLowerCase().includes("failed") ||
-      callStatus.toLowerCase().includes("insufficientcredit") ||
-      callStatus.toLowerCase().includes("rejected") ||
-      callStatus.toLowerCase().includes("error")
-    ) {
-      console.log("❌ Call blocked due to:", callStatus);
-      return res.status(400).json({
-        success: false,
-        error:
-          "We are currently upgrading our SmartCall main wallet to improve call quality and reliability. During this short maintenance period, calls may not connect.
-Ee truly apologise for any incomvinience this my cause, Thank you for your kind understanding and patience — we truly appreciate you.",
-      });
-    }
+if (
+  callStatus.toLowerCase().includes("failed") ||
+  callStatus.toLowerCase().includes("insufficientcredit") ||
+  callStatus.toLowerCase().includes("rejected") ||
+  callStatus.toLowerCase().includes("error")
+) {
+  console.log("❌ Call blocked due to:", callStatus);
+  return res.status(400).json({
+    success: false,
+    error:
+      "We are currently upgrading our SmartCall main wallet to improve call quality and reliability. During this short maintenance period, calls may not connect. We sincerely apologise for any inconvenience this may cause. Thank you for your kind understanding and patience — we truly appreciate you."
+  });
+}
 
     res.json({ success: true, result });
   } catch (error) {
@@ -130,4 +129,5 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log(`🚀 SmartCall backend running on port ${PORT}`)
 );
+
 
